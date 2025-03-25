@@ -1,0 +1,76 @@
+<div class="container mx-auto px-4 py-8 min-h-screen bg-background">
+  <div class="max-w-4xl mx-auto mb-12">
+    <h1 class="text-3xl font-bold text-center mb-8 text-primary">Nobel Prize Explorer</h1>
+    <form [formGroup]="filterForm" class="bg-card shadow-lg rounded-xl p-6">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-2 text-muted-foreground">Year</label>
+          <input
+            type="number"
+            formControlName="year"
+            placeholder="Enter year (1901-present)"
+            class="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+          />
+        </div>
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-2 text-muted-foreground">Category</label>
+          <select 
+            formControlName="category" 
+            class="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+          >
+            <option value="">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category">
+              {{ category | titlecase }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+      <div *ngIf="loading" class="text-lg text-primary animate-pulse">Loading...</div>
+      <div *ngIf="error" class="text-destructive bg-destructive/10 p-4 rounded-lg">{{ error }}</div>
+      <div *ngIf="!loading && !error && !filterForm.value.year" class="text-lg text-muted-foreground">
+        Please enter a year to view Nobel Prize winners
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="!loading && !error && filterForm.value.year">
+      <div *ngFor="let prize of paginatedPrizes" 
+        class="bg-card text-card-foreground rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="bg-primary/10 p-4 border-b border-primary/20">
+          <h2 class="text-xl font-bold text-primary">{{ prize.category | titlecase }} ({{ prize.year }})</h2>
+        </div>
+        <div class="p-6 space-y-4">
+          <div *ngFor="let laureate of prize.laureates" class="space-y-2 pb-4 last:pb-0 border-b last:border-0 border-primary/10">
+            <h3 class="text-lg font-semibold text-foreground">{{ laureate.firstname }} {{ laureate.surname }}</h3>
+            <p class="text-muted-foreground text-sm italic leading-relaxed">{{ laureate.motivation }}</p>
+            <p *ngIf="laureate.share !== '1'" class="text-sm text-primary font-medium">
+              Share: {{ laureate.share }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-center items-center gap-6 mt-12 mb-8" *ngIf="paginatedPrizes.length > 0">
+      <button
+        [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)"
+        class="px-6 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-all duration-300 font-medium"
+      >
+        Previous
+      </button>
+      <span class="text-foreground font-medium">Page {{ currentPage }} of {{ totalPages }}</span>
+      <button
+        [disabled]="currentPage === totalPages"
+        (click)="onPageChange(currentPage + 1)"
+        class="px-6 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-all duration-300 font-medium"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>
