@@ -4,7 +4,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package files first for better caching
-COPY package.json yarn.lock ./
+COPY package.json ./
 
 # Install dependencies and Angular CLI globally
 RUN yarn install && \
